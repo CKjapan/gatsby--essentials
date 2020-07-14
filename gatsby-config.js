@@ -6,6 +6,12 @@
 
 module.exports = {
   /* Your site config here */
+  siteMetadata: {
+    title: `ESSENTIALS`,
+    description: `おいしい食事を探究するサイト`,
+    lang: `ja`,
+    siteUrl: `https://determined-kalam-1ab853.netlify.app`,
+  },
   plugins: [`gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     {
@@ -15,5 +21,6 @@ module.exports = {
         path: `${__dirname}/src/images/`,
       },
     },
+    `gatsby-plugin-react-helmet`
   ]
 }
