@@ -12,8 +12,8 @@ function Header() {
         </div>
         <nav className="nav">
           <ul>
-            <li><a href="base-index.html">TOP</a></li>
-            <li><a href="base-about.html">ABOUT</a></li>
+            <li><a href="index.html">TOP</a></li>
+            <li><a href="about.html">ABOUT</a></li>
           </ul>
         </nav>
       </div>
