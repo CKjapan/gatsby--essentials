@@ -1,6 +1,6 @@
 /**
  * Configure your Gatsby site with this file.
- *
+ *CFPAT-q6XJPcGj6dWhAAco_zx9cb9igCYZgVfNrjNQgYlcNWI
  * See: https://www.gatsbyjs.org/docs/gatsby-config/
  */
 
@@ -37,5 +37,14 @@ module.exports = {
       },
     },
     `gatsby-plugin-offline`,
+    {
+      resolve: `gatsby-source-contentful`,
+      options: {
+        spaceId: process.env.CONTENTFUL_SPACE_ID,
+        // Learn about environment variables: https://gatsby.dev/env-vars
+        accessToken: process.env.CONTENTFUL_ACCESS_TOKEN,
+        host: process.env.CONTENTFUL_HOST,
+      },
+    },
   ]
 }
