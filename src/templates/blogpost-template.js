@@ -1,7 +1,7 @@
 import React from "react"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faChevronLeft,
@@ -11,6 +11,9 @@ import {
 import { faClock, faFolderOpen } from "@fortawesome/free-regular-svg-icons"
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types"
+import useContentfulImage from "../utils/useContentfulImage"
+import Seo from "../components/seo"
+import { documentToPlainTextString } from "@contentful/rich-text-plain-text-renderer"
 
 const options = {
   renderNode: {
@@ -20,12 +23,37 @@ const options = {
         {children}
       </h2>
     ),
+    [BLOCKS.EMBEDDED_ASSET]: node => (
+      <Img
+        fluid={useContentfulImage(node.data.target.fields.file["ja-JP"].url)}
+        alt={
+          node.data.target.fields.description
+            ? node.data.target.fields.description["ja-JP"]
+            : node.data.target.fields.title["ja-JP"]
+        }
+      />
+    ),
+  },
+  renderText: text => {
+    return text.split("\n").reduce((children, textSegment, index) => {
+      return [...children, index > 0 && <br key={index} />, textSegment]
+    }, [])
   },
 }
 
-function Blogpost({ data }) {
+function Blogpost({ data, pageContext, location }) {
   return (
     <Layout>
+      <Seo
+        pagetitle={data.contentfulBlogPost.title}
+        pagedesc={`${documentToPlainTextString(
+          data.contentfulBlogPost.content.json
+        ).slice(0, 70)}···`}
+        pagepath={location.pathname}
+        blogimg={`https:${data.contentfulBlogPost.eyecatch.file.url}`}
+        pageimgw={data.contentfulBlogPost.eyecatch.file.details.image.width}
+        pageimgh={data.contentfulBlogPost.eyecatch.file.details.image.height}
+      />
       <div className="eyecatch">
         <figure>
           <Img
@@ -47,7 +75,7 @@ function Blogpost({ data }) {
               <ul>
                 {data.contentfulBlogPost.category.map(cat => (
                   <li className={cat.categorySlug} key={cat.id}>
-                    {cat.category}
+                    <Link to={`/cat/${cat.categorySlug}/`}>{cat.category}</Link>
                   </li>
                 ))}
               </ul>
@@ -60,18 +88,25 @@ function Blogpost({ data }) {
             )}
           </div>
           <ul className="postlink">
-            <li className="prev">
-              <a href="base-blogpost.html" rel="prev">
-                <FontAwesomeIcon icon={faChevronLeft} />
-                <span>前の記事</span>
-              </a>
-            </li>
-            <li className="next">
-              <a href="base-blogpost.html" rel="next">
-                <span>次の記事</span>
-                <FontAwesomeIcon icon={faChevronRight} />
-              </a>
-            </li>
+            {pageContext.next && (
+              <li className="prev">
+                <Link to={`/blog/post/${pageContext.next.slug}/`} rel="prev">
+                  <FontAwesomeIcon icon={faChevronLeft} />
+                  <span>{pageContext.next.title}</span>
+                </Link>
+              </li>
+            )}
+            {pageContext.previous && (
+              <li className="next">
+                <Link
+                  to={`/blog/post/${pageContext.previous.slug}/`}
+                  rel="next"
+                >
+                  <span>{pageContext.previous.title}</span>
+                  <FontAwesomeIcon icon={faChevronRight} />
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </article>
@@ -82,8 +117,8 @@ function Blogpost({ data }) {
 export default Blogpost
 
 export const query = graphql`
-  query {
-    contentfulBlogPost {
+  query($id: String!) {
+    contentfulBlogPost(id: { eq: $id }) {
       title
       publishDateJP: publishDate(formatString: "YYYY年MM月DD日")
       publishDate
@@ -97,6 +132,15 @@ export const query = graphql`
           ...GatsbyContentfulFluid_withWebp
         }
         description
+        file {
+          details {
+            image {
+              height
+              width
+            }
+          }
+          url
+        }
       }
       content {
         json

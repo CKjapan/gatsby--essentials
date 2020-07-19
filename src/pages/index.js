@@ -1,5 +1,5 @@
 import React from "react"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 import Img from "gatsby-image"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
@@ -92,6 +92,28 @@ function Index({ data }) {
           />
         </figure>
       </section>
+
+      <section>
+        <div className="container">
+          <h2 className="sr-only">RECENT POSTS</h2>
+          <div className="posts">
+            {data.allContentfulBlogPost.edges.map(({ node }) => (
+              <article className="post" key={node.id}>
+                <Link to={`/blog/post/${node.slug}`}>
+                  <figure>
+                    <Img
+                      fluid={node.eyecatch.fluid}
+                      alt={node.eyecatch.description}
+                      style={{ height: "100%" }}
+                    />
+                  </figure>
+                  <h3>記事のタイトル</h3>
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
     </Layout>
   )
 }
@@ -132,6 +154,25 @@ export const query = graphql`
       childImageSharp {
         fluid(maxWidth: 320) {
           ...GatsbyImageSharpFluid_withWebp
+        }
+      }
+    }
+    allContentfulBlogPost(
+      sort: { fields: publishDate, order: DESC }
+      skip: 0
+      limit: 4
+    ) {
+      edges {
+        node {
+          title
+          id
+          slug
+          eyecatch {
+            fluid(maxWidth: 573) {
+              ...GatsbyContentfulFluid_withWebp
+            }
+            description
+          }
         }
       }
     }
