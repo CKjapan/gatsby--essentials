@@ -109,7 +109,7 @@ function Index({ data }) {
                       style={{ height: "100%" }}
                     />
                   </figure>
-                  <h3>記事のタイトル</h3>
+                  <h3>{node.title}</h3>
                 </Link>
               </article>
             ))}
