@@ -14,6 +14,8 @@ function Index({ data }) {
             fluid={data.hero.childImageSharp.fluid}
             alt=""
             style={{ height: "100%" }}
+            loading="eager"
+            durationFadeIn={100}
           />
         </figure>
         <div className="catch">
